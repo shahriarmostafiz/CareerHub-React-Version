@@ -9,12 +9,27 @@ const AppliedJobs = () => {
     const jobs = useLoaderData()
 
     const [jobsApplied, setJobsApplied] = useState([])
-    const [filter, setFilter] = useState('')
+    const [displayJobs, setDisplayJobs] = useState([])
+    const handleFilter = filter => {
+        if (filter === 'all') {
+            setDisplayJobs(jobsApplied)
+        }
+        // "remote_or_onsite": "Remote"
+        else if (filter === 'remote') {
+            const remoteJobs = jobsApplied.filter(job => job.remote_or_onsite === "Remote")
+            setDisplayJobs(remoteJobs)
+        }
+        else if (filter === 'onsite') {
+            const onSiteJobs = jobsApplied.filter(job => job.remote_or_onsite === 'Onsite')
+            setDisplayJobs(onSiteJobs)
+        }
+    }
     useEffect(() => {
         const storedJobApplications = getSavedJobApplication()
         const appliedJobs = jobs.filter(job => storedJobApplications.includes(job.id))
         setJobsApplied(appliedJobs)
-    }, [])
+        setDisplayJobs(appliedJobs)
+    }, [jobs])
     console.log(jobsApplied);
     return (
         <div>
@@ -24,13 +39,13 @@ const AppliedJobs = () => {
                     Filter by <AiOutlineDown> </AiOutlineDown>
                 </span></summary>
                 <ul className="p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52">
-                    <li><a>All </a></li>
-                    <li><a >Remote</a></li>
-                    <li><a>On Site</a></li>
+                    <li onClick={() => handleFilter('all')}><a>All </a></li>
+                    <li onClick={() => handleFilter('remote')}><a >Remote</a></li>
+                    <li onClick={() => handleFilter('onsite')}><a>On Site</a></li>
                 </ul>
             </details>
             {
-                jobsApplied.map(job => <AppliedJobcard key={job.id} job={job}></AppliedJobcard>)
+                displayJobs.map(job => <AppliedJobcard key={job.id} job={job}></AppliedJobcard>)
             }
             {/* {
                 jobsApplied.map(job => <AppliedJobcard key={job.id} job={job}></AppliedJobcard>)
